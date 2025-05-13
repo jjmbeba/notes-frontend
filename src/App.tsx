@@ -15,7 +15,7 @@ function App() {
               </CardTitle>
               <div className="flex items-center gap-3">
                 <Button size={'icon'} variant={'ghost'}>
-                  <EditIcon className="size-4" />
+                <EditIcon className="size-4" />
                 </Button>
                 <Checkbox />
               </div>

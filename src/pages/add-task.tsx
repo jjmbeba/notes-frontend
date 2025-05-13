@@ -36,7 +36,7 @@ const AddTaskPage = () => {
   })
 
   return (
-    <main className="min-h-[90vh] flex flex-col items-center justify-center">
+    <main className="min-h-[90vh] flex flex-col items-center justify-center px-4 md:px-6 lg:px-8">
       <h2 className="scroll-m-20 pb-2 text-xl font-semibold tracking-tight first:mt-0">
         Add a task
       </h2>
@@ -45,7 +45,7 @@ const AddTaskPage = () => {
         e.stopPropagation()
 
         form.handleSubmit()
-      }} className="grid gap-4 w-1/3">
+      }} className="grid gap-4 w-full md:w-2/3 lg:w-1/3">
         <div className="grid gap-2">
           <Label htmlFor="name">Name</Label>
           <form.Field
