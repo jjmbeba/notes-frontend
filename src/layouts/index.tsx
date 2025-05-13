@@ -3,7 +3,7 @@ import Navbar from '../components/navbar'
 
 const Layout = () => {
   return (
-    <div>
+    <div className='px-10'>
         <Navbar />
         <Outlet />
     </div>
