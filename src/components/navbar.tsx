@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils"
 import { Link, NavLink } from "react-router"
-import { buttonVariants } from "./ui/button"
 
 const Navbar = () => {
     return (

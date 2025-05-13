@@ -37,6 +37,9 @@ const AddTaskPage = () => {
 
   return (
     <main className="min-h-[90vh] flex flex-col items-center justify-center">
+      <h2 className="scroll-m-20 pb-2 text-xl font-semibold tracking-tight first:mt-0">
+        Add a task
+      </h2>
       <form onSubmit={(e) => {
         e.preventDefault()
         e.stopPropagation()
