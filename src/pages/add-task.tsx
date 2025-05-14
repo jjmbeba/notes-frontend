@@ -1,9 +1,13 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { env } from "@/env"
 import { Label } from "@radix-ui/react-label"
 import { useForm } from "@tanstack/react-form"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Loader } from "lucide-react"
+import { useNavigate } from "react-router"
+import { toast } from "sonner"
 import { z } from "zod"
 
 const addTaskSchema = z.object({
@@ -16,22 +20,55 @@ const addTaskSchema = z.object({
     message: 'Task description should be at least 5 characters'
   }).max(500, {
     message: 'Task description should not exceed 500 characters'
-  }),
-  is_completed: z.boolean()
+  })
 })
 
 const AddTaskPage = () => {
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+
+
+  const { mutate: createTask, isPending } = useMutation({
+    mutationKey: ['tasks'],
+    mutationFn: async (values: z.infer<typeof addTaskSchema>) => {
+      try {
+        return await fetch(`${env.VITE_BACKEND_URL}/tasks`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(values)
+        })
+      } catch (error) {
+        console.error(error)
+        throw error
+      }
+    },
+    onError: (error) => {
+      console.error(error)
+      toast.error(error.message)
+    },
+    onSuccess: () => {
+      toast.success("Task created successfully")
+      queryClient.invalidateQueries({
+        queryKey: ['tasks']
+      })
+      navigate('/')
+    }
+  })
+
+
   const form = useForm({
     defaultValues: {
       name: '',
       description: '',
-      is_completed: false
     },
     validators: {
       onChange: addTaskSchema
     },
     onSubmit: ({ value }) => {
       console.log(value)
+      createTask(value)
     }
   })
 
@@ -94,7 +131,7 @@ const AddTaskPage = () => {
           selector={(state) => [state.canSubmit, state.isSubmitting]}
           children={([canSubmit, isSubmitting]) => (
             <Button type="submit" disabled={!canSubmit}>
-              {isSubmitting ? <Loader className="animate-spin" /> : 'Add task'}
+              {isSubmitting || isPending ? <Loader className="animate-spin" /> : 'Add task'}
             </Button>
           )}
         />
