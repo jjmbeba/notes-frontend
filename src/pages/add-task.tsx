@@ -31,18 +31,13 @@ const AddTaskPage = () => {
   const { mutate: createTask, isPending } = useMutation({
     mutationKey: ['tasks'],
     mutationFn: async (values: z.infer<typeof addTaskSchema>) => {
-      try {
-        return await fetch(`${env.VITE_BACKEND_URL}/tasks`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(values)
-        })
-      } catch (error) {
-        console.error(error)
-        throw error
-      }
+      return await fetch(`${env.VITE_BACKEND_URL}/tasks`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(values)
+      })
     },
     onError: (error) => {
       console.error(error)
