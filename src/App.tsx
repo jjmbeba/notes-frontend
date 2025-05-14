@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { EditIcon } from "lucide-react"
+import { EditIcon, Ghost, Loader, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { z } from "zod"
 import { Button } from "./components/ui/button"
@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "./components
 import { env } from "./env"
 import EditTaskForm from "./forms/edit-task"
 import type { Task } from "./types"
+import { Link } from "react-router"
 
 const editTaskSchema = z.object({
   id: z.number(),
@@ -46,7 +47,7 @@ function App() {
   })
 
 
-  const { data: tasks, error } = useQuery<Task[], Error>({
+  const { data: tasks, error, isLoading } = useQuery<Task[], Error>({
     queryKey: ['tasks'],
     queryFn: async () => {
       try {
@@ -60,6 +61,20 @@ function App() {
 
   if (error) {
     toast.error(error.message)
+  }
+
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center gap-3">
+      <Loader2 className="size-6 animate-spin" />
+      Hang on. Loading tasks...
+    </div>
+  }
+
+  if (!tasks || tasks.length < 1) {
+    return <div className="min-h-screen flex flex-col items-center justify-center font-semibold ">
+      <Ghost className="size-8" />
+      No tasks found. Create some <Link className="underline" to={'/add-task'}>here.</Link>
+    </div>
   }
 
   return (
@@ -87,7 +102,7 @@ function App() {
                           Edit task
                         </h2>
                       </DialogHeader>
-                      <EditTaskForm {...task} editTask={editTask} isPending={isPending}/>
+                      <EditTaskForm {...task} editTask={editTask} isPending={isPending} />
                     </DialogContent>
                   </Dialog>
                   <Checkbox className="cursor-pointer" onClick={() => editTask({
