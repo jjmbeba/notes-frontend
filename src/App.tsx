@@ -1,12 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { EditIcon } from "lucide-react"
 import { toast } from "sonner"
+import { z } from "zod"
 import { Button } from "./components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card"
 import { Checkbox } from "./components/ui/checkbox"
+import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "./components/ui/dialog"
 import { env } from "./env"
+import EditTaskForm from "./forms/edit-task"
 import type { Task } from "./types"
-import { z } from "zod"
 
 const editTaskSchema = z.object({
   id: z.number(),
@@ -18,7 +20,7 @@ const editTaskSchema = z.object({
 function App() {
   const queryClient = useQueryClient()
 
-  const { mutate: editTask } = useMutation({
+  const { mutate: editTask, isPending } = useMutation({
     mutationKey: ['tasks'],
     mutationFn: async (values: z.infer<typeof editTaskSchema>) => {
       return await fetch(`${env.VITE_BACKEND_URL}/tasks/${values.id}`, {
@@ -63,27 +65,43 @@ function App() {
   return (
     <main className="min-h-screen">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 mt-10 gap-4 px-4 md:px-6 lg:px-8">
-        {tasks?.map(({ id, name, description, is_completed }) => (
-          <Card key={id} className="max-h-[10rem]">
-            <CardHeader className="flex items-center justify-between">
-              <CardTitle>
-                {name}
-              </CardTitle>
-              <div className="flex items-center gap-3">
-                <Button size={'icon'} variant={'ghost'}>
-                  <EditIcon className="size-4" />
-                </Button>
-                <Checkbox className="cursor-pointer" onClick={() => editTask({
-                  id,
-                  is_completed: !is_completed
-                })} checked={is_completed} />
-              </div>
-            </CardHeader>
-            <CardContent>
-              {description}
-            </CardContent>
-          </Card>
-        ))}
+        {tasks?.map((task) => {
+          const { id, name, description, is_completed } = task
+
+          return (
+            <Card key={id} className="max-h-[10rem]">
+              <CardHeader className="flex items-center justify-between">
+                <CardTitle>
+                  {name}
+                </CardTitle>
+                <div className="flex items-center gap-3">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button size={'icon'} variant={'ghost'}>
+                        <EditIcon className="size-4" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <h2 className="scroll-m-20 pb-2 text-xl font-semibold tracking-tight first:mt-0">
+                          Edit task
+                        </h2>
+                      </DialogHeader>
+                      <EditTaskForm {...task} editTask={editTask} isPending={isPending}/>
+                    </DialogContent>
+                  </Dialog>
+                  <Checkbox className="cursor-pointer" onClick={() => editTask({
+                    id,
+                    is_completed: !is_completed
+                  })} checked={is_completed} />
+                </div>
+              </CardHeader>
+              <CardContent>
+                {description}
+              </CardContent>
+            </Card>
+          )
+        })}
       </div>
     </main>
   )
