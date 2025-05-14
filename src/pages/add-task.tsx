@@ -17,7 +17,7 @@ const addTaskSchema = z.object({
   }).max(500, {
     message: 'Task description should not exceed 500 characters'
   }),
-  isCompleted: z.boolean()
+  is_completed: z.boolean()
 })
 
 const AddTaskPage = () => {
@@ -25,7 +25,7 @@ const AddTaskPage = () => {
     defaultValues: {
       name: '',
       description: '',
-      isCompleted: false
+      is_completed: false
     },
     validators: {
       onChange: addTaskSchema
